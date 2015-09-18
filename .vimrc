@@ -20,6 +20,7 @@ NeoBundle 'jlanzarotta/bufexplorer'
 NeoBundle 'pangloss/vim-javascript'
 NeoBundle 'mxw/vim-jsx'
 NeoBundle 'editorconfig/editorconfig-vim'
+NeoBundle 'exu/pgsql.vim'
 
 call neobundle#end()
 
@@ -209,6 +210,10 @@ let g:solarized_termcolors=256
 syntax enable
 set bg=dark
 colorscheme solarized
+
+" all sql files are by default pgsql
+let g:sql_type_default = 'pgsql'
+
 
 command B :BufExplorer
 
