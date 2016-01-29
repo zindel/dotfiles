@@ -21,6 +21,9 @@ NeoBundle 'pangloss/vim-javascript'
 NeoBundle 'mxw/vim-jsx'
 NeoBundle 'editorconfig/editorconfig-vim'
 NeoBundle 'exu/pgsql.vim'
+NeoBundle 'lambdatoast/elm.vim'
+NeoBundle 'raichoo/purescript-vim'
+NeoBundle 'kchmck/vim-coffee-script'
 
 call neobundle#end()
 
@@ -170,6 +173,7 @@ nnoremap <C-Down> <C-W><Down>
 nnoremap <C-Left> <C-W><Left>
 nnoremap <C-Right> <C-W><Right>
 
+
 inoremap <C-Up> <C-O><C-W><Up>
 inoremap <C-Down> <C-O><C-W><Down>
 inoremap <C-Left> <C-O><C-W><Left>
@@ -205,15 +209,24 @@ set cursorline
 
 " color theme support
 "let g:solarized_contrast="high"    "default value is normal
-"let g:solarized_visibility="high"    "default value is normal
-let g:solarized_termcolors=256
+let g:solarized_visibility="high"    "default value is normal
+"let g:solarized_termcolors=256
 syntax enable
-set bg=dark
 colorscheme solarized
+set bg=dark
 
 " all sql files are by default pgsql
 let g:sql_type_default = 'pgsql'
 
+function! AlignImportES6()
+python << EOF
+for line in vim.current.buffer:
+    print line
+EOF
+endfunction
 
-command B :BufExplorer
+highlight ExtraWhitespace ctermbg=red guibg=red
+" Show trailing whitepace and spaces before a tab:
+autocmd Syntax * syn match ExtraWhitespace /\s\+$\| \+\ze\t/ containedin=ALL
 
+command! AI :call AlignImportES6()
