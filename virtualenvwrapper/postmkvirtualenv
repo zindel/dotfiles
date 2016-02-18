@@ -1,0 +1,21 @@
+#!/bin/sh
+
+cat <<EOF >$VIRTUAL_ENV/rex.yaml
+project: rex.study_demo
+parameters:
+  db: pgsql:$(basename $VIRTUAL_ENV)
+  attach_dir: /Users/zindel/tmp/files
+uwsgi:
+  socket: $VIRTUAL_ENV/socket
+EOF
+
+mkdir $VIRTUAL_ENV/src
+hg clone ssh://hg@bitbucket.org/prometheus/props.build $VIRTUAL_ENV/src/props.build
+pip install -e $VIRTUAL_ENV/src/props.build
+
+#pip install props.build
+pip install pbbt coverage
+pip install ipython
+pip install cython
+pip install cookiecutter
+
