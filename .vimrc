@@ -24,6 +24,9 @@ NeoBundle 'exu/pgsql.vim'
 NeoBundle 'lambdatoast/elm.vim'
 NeoBundle 'raichoo/purescript-vim'
 NeoBundle 'kchmck/vim-coffee-script'
+NeoBundle 'mattn/webapi-vim'
+NeoBundle 'mattn/gist-vim'
+NeoBundle 'ctrlpvim/ctrlp.vim'
 
 call neobundle#end()
 
@@ -67,18 +70,6 @@ vnoremap <C-S>		<C-C>:update<CR>
 inoremap <C-S>		<C-O>:update<CR>
 inoremap <C-V>		<C-O>"*p<CR>
 
-" Use CTRL+Arrows to movei across windows
-imap <C-W> <C-O><C-W>
-"imap <Esc><Up>		<C-W>k
-"imap <M-Up>		<C-O><C-W>k
-"map <Esc><Down>		<C-W>j
-"imap <M-Down>		<C-O><C-W>j
-"noremap <Esc><Left>		<C-W><Left>
-"inoremap <C-Left>		<C-O><C-W><Left>
-"noremap <Esc><Right>		<C-W><Right>
-"inoremap <C-Right>		<C-O><C-W><Right>
-
-" oncve again do something
 
 set laststatus=2
 "set statusline=%-10.20t%7.7m%20.20y%7.7l,%7.7c%10.10P%5.5b
@@ -102,13 +93,7 @@ vnoremap <Up> gk
 inoremap <Down> <C-o>gj
 inoremap <Up> <C-o>gk
 
-nnoremap <C-T> :tabnew<CR>
-nnoremap <C-N> :tabnext<CR>
-nnoremap <C-P> :tabprevious<CR>
 
-"set encoding=koi8-r
-"set fileencodings=cp1251,koi8-r 
-"set fileencoding=koi8-r 
 set directory=~/.vimtmp/,.,/tmp
 
 function ToDos()
@@ -121,29 +106,6 @@ function ToKoi()
 	:syntax on
 endfunction
 
-au BufReadPost * if getline(1) =~ "# dos:" | call ToDos() | endif
-au BufReadPost * if getline(1) =~ ".*koi8.*" | call ToKoi() | endif
-au BufReadPost * if getline(1) =~ ".*KOI8.*" | call ToKoi() | endif
-au BufReadPost * if getline(2) =~ ".*koi8.*" | call ToKoi() | endif
-
-function Insert()
-	set cul
-endfunction
-
-function NoInsert()
-	set nocul
-	"syntax on
-	"\<Esc>
-	"\<Esc>
-	"\<Esc>
-endfunction
-
-function Yet()
-	<Esc>
-endfunction
-
-set autoindent		" always set autoindenting on
-"set bg=light
 
 let python_highlight_all = 1
 
@@ -151,12 +113,9 @@ set clipboard=unnamed
 set expandtab
 set cmdheight=1
 
-function! CHANGE_CURR_DIR() 
-"    let _dir = expand("%:p:h") 
+function! CHANGE_CURR_DIR()
     exec "cd %:p:h"
-"    exec "cd " . _dir 
-"    unlet _dir 
-endfunction 
+endfunction
 autocmd BufWinEnter * call CHANGE_CURR_DIR()
 autocmd BufEnter * call CHANGE_CURR_DIR()
 autocmd WinEnter * call CHANGE_CURR_DIR()
@@ -170,21 +129,17 @@ inoremap <F2> <C-O>:TlistToggle<CR><C-O>:TlistUpdate<CR>
 
 nnoremap <C-Up> <C-W><Up>
 nnoremap <C-Down> <C-W><Down>
-nnoremap <C-Left> <C-W><Left>
-nnoremap <C-Right> <C-W><Right>
 
 
 inoremap <C-Up> <C-O><C-W><Up>
 inoremap <C-Down> <C-O><C-W><Down>
-inoremap <C-Left> <C-O><C-W><Left>
-inoremap <C-Right> <C-O><C-W><Right>
 
-function! TabForward() 
- if col('.')>1 && strpart( getline('.'), col('.')-2, 3 ) =~ '^\w' 
-   return "\<C-N>" 
- else 
-   return "\<Tab>" 
-endfunction 
+function! TabForward()
+ if col('.')>1 && strpart( getline('.'), col('.')-2, 3 ) =~ '^\w'
+   return "\<C-N>"
+ else
+   return "\<Tab>"
+endfunction
 
 inoremap <Tab> <C-R>=TabForward()<CR>
 
@@ -207,26 +162,36 @@ let mapleader = ","
 set t_Co=256
 set cursorline
 
+set bg=dark
 " color theme support
 "let g:solarized_contrast="high"    "default value is normal
 let g:solarized_visibility="high"    "default value is normal
 "let g:solarized_termcolors=256
 syntax enable
 colorscheme solarized
-set bg=dark
+"set bg=dark
 
 " all sql files are by default pgsql
 let g:sql_type_default = 'pgsql'
 
-function! AlignImportES6()
-python << EOF
-for line in vim.current.buffer:
-    print line
-EOF
-endfunction
 
-highlight ExtraWhitespace ctermbg=red guibg=red
 " Show trailing whitepace and spaces before a tab:
+highlight ExtraWhitespace ctermbg=red guibg=red
 autocmd Syntax * syn match ExtraWhitespace /\s\+$\| \+\ze\t/ containedin=ALL
 
-command! AI :call AlignImportES6()
+" CtrlP settings
+let g:ctrlp_custom_ignore = {
+  \ 'dir':  '\v[\/](\.git|\.hg|\.svn|[^\/]+\.egg-info)$',
+  \ 'file': '\v\.(exe|so|dll|pyc)$',
+  \ 'link': 'some_bad_symbolic_links',
+  \ }
+let g:ctrlp_root_markers = ['rex.core']
+nnoremap <C-B> :CtrlPBuffer<CR>
+nnoremap <C-o> :CtrlP $VIRTUAL_ENV/src<CR> 
+
+
+" Alternative tab navigation
+nnoremap <C-T> :tabnew<CR>
+nnoremap <C-Left> :tabprevious<CR>
+nnoremap <C-Right> :tabprevious<CR>
+
