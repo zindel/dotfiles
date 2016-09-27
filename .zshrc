@@ -79,6 +79,9 @@ export PS1='%{$fg[blue]%}%~%{$reset_color%} %{$fg[green]%}$(vcprompt --format="[
 
 export WORKON_HOME=/Users/zindel/dev
 source /usr/local/bin/virtualenvwrapper.sh
+if [ -n "$VIRTUAL_ENV" ]; then
+    workon `basename $VIRTUAL_ENV`
+fi
 
 export LC_ALL=en_US.UTF-8
 
@@ -92,6 +95,23 @@ export LC_ALL=en_US.UTF-8
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 #
+#
+
+# Octave
+export FONTCONFIG_PATH=/opt/X11/lib/X11/fontconfig
+
 
 alias pe="pip install -e"
 alias reload=". ~/.zshrc && echo 'ZSH config reloaded from ~/.zshrc'"
+nv() {
+    nvim -c 'exe ":set nosplitright | :vsplit | :set splitright | :terminal"'
+}
+
+# OPAM configuration
+. /Users/zindel/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true
+eval `opam config env`;
+
+# Change directory
+if [ -n "$CHDIR" ]; then
+    cd $CHDIR
+fi

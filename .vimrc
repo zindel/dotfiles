@@ -27,6 +27,8 @@ NeoBundle 'kchmck/vim-coffee-script'
 NeoBundle 'mattn/webapi-vim'
 NeoBundle 'mattn/gist-vim'
 NeoBundle 'ctrlpvim/ctrlp.vim'
+NeoBundle 'tpope/vim-commentary'
+NeoBundle 'mileszs/ack.vim'
 
 call neobundle#end()
 
@@ -36,6 +38,10 @@ filetype plugin indent on
 " If there are uninstalled bundles found on startup,
 " this will conveniently prompt you to install them.
 NeoBundleCheck
+
+if executable('ag')
+  let g:ackprg = 'ag --vimgrep'
+endif
 
 
 
@@ -145,7 +151,7 @@ inoremap <Tab> <C-R>=TabForward()<CR>
 
 
 set viminfo='100,\"200,:50,%,n~/.viminfo
-au BufReadPost * if line("'\"") > 0|if line("'\"") <= line("$")|exe("norm '\"")|else|exe "norm $"|endif|endif 
+au BufReadPost * if line("'\"") > 0|if line("'\"") <= line("$")|exe("norm '\"")|else|exe "norm $"|endif|endif
 
 :au BufNewFile,BufRead *.boo setf boo
 
@@ -187,11 +193,205 @@ let g:ctrlp_custom_ignore = {
   \ }
 let g:ctrlp_root_markers = ['rex.core']
 nnoremap <C-B> :CtrlPBuffer<CR>
-nnoremap <C-o> :CtrlP $VIRTUAL_ENV/src<CR> 
+nnoremap <C-o> :CtrlP $VIRTUAL_ENV/src<CR>
+
+"Home/End
+nnoremap B 0
+nnoremap E $
 
 
-" Alternative tab navigation
-nnoremap <C-T> :tabnew<CR>
-nnoremap <C-Left> :tabprevious<CR>
-nnoremap <C-Right> :tabprevious<CR>
 
+" Russian Phonetic Mapping
+
+cmap я q
+cmap Я Q
+nmap я q
+nmap Я Q
+vmap я q
+vmap Я Q
+cmap ш w
+cmap Ш W
+nmap ш w
+nmap Ш W
+vmap ш w
+vmap Ш W
+cmap е e
+cmap Е E
+nmap е e
+nmap Е E
+vmap е e
+vmap Е E
+cmap р r
+cmap Р R
+nmap р r
+nmap Р R
+vmap р r
+vmap Р R
+cmap т t
+cmap Т T
+nmap т t
+nmap Т T
+vmap т t
+vmap Т T
+cmap ы y
+cmap Ы Y
+nmap ы y
+nmap Ы Y
+vmap ы y
+vmap Ы Y
+cmap у u
+cmap У U
+nmap у u
+nmap У U
+vmap у u
+vmap У U
+cmap и i
+cmap И I
+nmap и i
+nmap И I
+vmap и i
+vmap И I
+cmap о o
+cmap О O
+nmap о o
+nmap О O
+vmap о o
+vmap О O
+cmap п p
+cmap П P
+nmap п p
+nmap П P
+vmap п p
+vmap П P
+cmap ю [
+cmap Ю [
+nmap ю [
+nmap Ю [
+vmap ю [
+vmap Ю [
+cmap ж ]
+cmap Ж ]
+nmap ж ]
+nmap Ж ]
+vmap ж ]
+vmap Ж ]
+cmap а a
+cmap А A
+nmap а a
+nmap А A
+vmap а a
+vmap А A
+cmap с s
+cmap С S
+nmap с s
+nmap С S
+vmap с s
+vmap С S
+cmap д d
+cmap Д D
+nmap д d
+nmap Д D
+vmap д d
+vmap Д D
+cmap ф f
+cmap Ф F
+nmap ф f
+nmap Ф F
+vmap ф f
+vmap Ф F
+cmap г g
+cmap Г G
+nmap г g
+nmap Г G
+vmap г g
+vmap Г G
+cmap ч h
+cmap Ч H
+nmap ч h
+nmap Ч H
+vmap ч h
+vmap Ч H
+cmap й j
+cmap Й J
+nmap й j
+nmap Й J
+vmap й j
+vmap Й J
+cmap к k
+cmap К K
+nmap к k
+nmap К K
+vmap к k
+vmap К K
+cmap л l
+cmap Л L
+nmap л l
+nmap Л L
+vmap л l
+vmap Л L
+cmap э \
+cmap Э \
+nmap э \
+nmap Э \
+vmap э \
+vmap Э \
+cmap щ `
+cmap Щ `
+nmap щ `
+nmap Щ `
+vmap щ `
+vmap Щ `
+cmap з z
+cmap З Z
+nmap з z
+nmap З Z
+vmap з z
+vmap З Z
+cmap х x
+cmap Х X
+nmap х x
+nmap Х X
+vmap х x
+vmap Х X
+cmap ц c
+cmap Ц C
+nmap ц c
+nmap Ц C
+vmap ц c
+vmap Ц C
+cmap в v
+cmap В V
+nmap в v
+nmap В V
+vmap в v
+vmap В V
+cmap б b
+cmap Б B
+nmap б b
+nmap Б B
+vmap б b
+vmap Б B
+cmap н n
+cmap Н N
+nmap н n
+nmap Н N
+vmap н n
+vmap Н N
+cmap м m
+cmap М M
+nmap м m
+nmap М M
+vmap м m
+vmap М M
+cmap ь -
+cmap Ь -
+nmap ь -
+nmap Ь -
+vmap ь -
+vmap Ь -
+cmap ъ =
+cmap Ъ =
+nmap ъ =
+nmap Ъ =
+vmap ъ =
+vmap Ъ =
