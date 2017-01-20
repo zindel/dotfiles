@@ -102,20 +102,10 @@ inoremap <Up> <C-o>gk
 
 set directory=~/.vimtmp/,.,/tmp
 
-function ToDos()
-	:e ++enc=866
-	:syntax on
-endfunction
-
-function ToKoi()
-	:e ++enc=koi8-r
-	:syntax on
-endfunction
-
 
 let python_highlight_all = 1
 
-set clipboard=unnamed
+set clipboard^=unnamed
 set expandtab
 set cmdheight=1
 
@@ -172,7 +162,7 @@ set bg=dark
 " color theme support
 "let g:solarized_contrast="high"    "default value is normal
 let g:solarized_visibility="high"    "default value is normal
-"let g:solarized_termcolors=256
+let g:solarized_termcolors=256
 syntax enable
 colorscheme solarized
 "set bg=dark
@@ -201,8 +191,7 @@ nnoremap E $
 
 
 
-" Russian Phonetic Mapping
-
+" {{{ Russian Phonetic Mapping
 cmap я q
 cmap Я Q
 nmap я q
@@ -394,4 +383,6 @@ cmap Ъ =
 nmap ъ =
 nmap Ъ =
 vmap ъ =
-vmap Ъ =
+" }}}
+
+" vim: foldmethod=marker:

@@ -1,117 +1,107 @@
-# Path to your oh-my-zsh installation.
+# {{{ oh-my-zsh
 export ZSH=/Users/zindel/.oh-my-zsh
-
-# Set name of the theme to load.
-# Look in ~/.oh-my-zsh/themes/
-# Optionally, if you set this to "random", it'll load a random theme each
-# time that oh-my-zsh is loaded.
 ZSH_THEME="robbyrussell"
-
-# Uncomment the following line to use case-sensitive completion.
-# CASE_SENSITIVE="true"
-
-# Uncomment the following line to use hyphen-insensitive completion. Case
-# sensitive completion must be off. _ and - will be interchangeable.
-# HYPHEN_INSENSITIVE="true"
-
-# Uncomment the following line to disable bi-weekly auto-update checks.
-# DISABLE_AUTO_UPDATE="true"
-
-# Uncomment the following line to change how often to auto-update (in days).
-# export UPDATE_ZSH_DAYS=13
-
-# Uncomment the following line to disable colors in ls.
-# DISABLE_LS_COLORS="true"
-
-# Uncomment the following line to disable auto-setting terminal title.
-# DISABLE_AUTO_TITLE="true"
-
-# Uncomment the following line to enable command auto-correction.
-# ENABLE_CORRECTION="true"
-
-# Uncomment the following line to display red dots whilst waiting for completion.
-# COMPLETION_WAITING_DOTS="true"
-
-# Uncomment the following line if you want to disable marking untracked files
-# under VCS as dirty. This makes repository status check for large repositories
-# much, much faster.
-# DISABLE_UNTRACKED_FILES_DIRTY="true"
-
-# Uncomment the following line if you want to change the command execution time
-# stamp shown in the history command output.
-# The optional three formats: "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
-# HIST_STAMPS="mm/dd/yyyy"
-
-# Would you like to use another custom folder than $ZSH/custom?
-# ZSH_CUSTOM=/path/to/new-custom-folder
-
-# Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
-# Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
-# Example format: plugins=(rails git textmate ruby lighthouse)
-# Add wisely, as too many plugins slow down shell startup.
-plugins=(git)
-
-# User configuration
-
-export PATH="/Users/zindel/bin:/usr/local/texlive/2015basic/bin/x86_64-darwin/:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
-# export MANPATH="/usr/local/man:$MANPATH"
-
+DISABLE_AUTO_UPDATE="true"
+DISABLE_AUTO_TITLE="true"
 source $ZSH/oh-my-zsh.sh
+# }}}
 
-# You may need to manually set your language environment
-# export LANG=en_US.UTF-8
+# {{{ GLOBAL Environment variables: PATH, LC_ALL, etc
+export PATH="/Users/zindel/bin:/usr/local/texlive/2015basic/bin/x86_64-darwin/:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+export LC_ALL=en_US.UTF-8
+export EDITOR=nvim
+# }}}
 
-# Preferred editor for local and remote sessions
-# if [[ -n $SSH_CONNECTION ]]; then
-#   export EDITOR='vim'
-# else
-#   export EDITOR='mvim'
-# fi
-
-# Compilation flags
-# export ARCHFLAGS="-arch x86_64"
-
-# ssh
-export SSH_KEY_PATH="~/.ssh/id_rsa"
-
+# {{{ Prompt
 setopt prompt_subst
 export PS1='%{$fg[blue]%}%~%{$reset_color%} %{$fg[green]%}$(vcprompt --format="[%b]")%{$reset_color%}$ '
+# }}}
 
+# {{{ virtualenvwrapper
 export WORKON_HOME=/Users/zindel/dev
 source /usr/local/bin/virtualenvwrapper.sh
 if [ -n "$VIRTUAL_ENV" ]; then
     workon `basename $VIRTUAL_ENV`
 fi
+# }}}
 
-export LC_ALL=en_US.UTF-8
-
-
-# Set personal aliases, overriding those provided by oh-my-zsh libs,
-# plugins, and themes. Aliases can be placed here, though oh-my-zsh
-# users are encouraged to define aliases within the ZSH_CUSTOM folder.
-# For a full list of active aliases, run `alias`.
-#
-# Example aliases
-# alias zshconfig="mate ~/.zshrc"
-# alias ohmyzsh="mate ~/.oh-my-zsh"
-#
-#
-
-# Octave
+# {{{ Octave support
 export FONTCONFIG_PATH=/opt/X11/lib/X11/fontconfig
+# }}}
 
-
+# {{{ Aliases
 alias pe="pip install -e"
 alias reload=". ~/.zshrc && echo 'ZSH config reloaded from ~/.zshrc'"
+# }}}
+
+# {{{ NeoVim as terminal manager (obsolete)
 nv() {
     nvim -c 'exe ":set nosplitright | :vsplit | :set splitright | :terminal"'
 }
+# }}}
 
-# OPAM configuration
+# {{{ OCAML support
 . /Users/zindel/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true
 eval `opam config env`;
+# }}}
 
-# Change directory
+# {{{ $CHDIR: if set - go there
 if [ -n "$CHDIR" ]; then
     cd $CHDIR
 fi
+# }}}
+
+# {{{1 tmux support
+
+# {{{2 'v' command: open nvim in left split or move there
+v() {
+    [ -z "$TMUX" ] && echo "not in tmux" && exit 1
+    PANE=`tmux list-panes -F "#{pane_index} #{pane_current_command}" | grep nvim | awk '{print $1}'`
+
+    if [ -n "$PANE" ]; then
+        tmux select-pane -t:.$PANE
+    else
+        tmux split-window -h -c `pwd` nvim
+    fi
+}
+# 2}}}
+
+# {{{2 's' command: easy create/swicth tmux sessions
+s() {
+    if [ -n "$1" ]; then
+        SESSION=`tmux list-sessions -F "#{session_name}" | grep "^$1$"`
+        if [ -n "$SESSION" ]; then
+            if [ -n "$TMUX" ]; then
+                tmux switch-client -t $SESSION
+            else
+                tmux attach -t $SESSION
+            fi
+        else
+            SESSION="$1"
+            if [ -n "$TMUX" ]; then
+                tmux new -d -s $SESSION
+                tmux switch-client -t $SESSION
+            else
+                tmux new -s $SESSION
+            fi
+        fi
+    else
+        if [ -n "$TMUX" ]; then
+            CMD="switch-client"
+        else
+            CMD="attach"
+        fi
+
+        if `tmux has-session`; then
+            S=`tmux list-sessions | fzf | cut -f1 -d:`
+            tmux "$CMD" -t "$S"
+        else
+            echo "No sessions. Enter name to create one"
+        fi
+    fi
+}
+# 2}}}
+
+# 1}}}
+
+# vim: foldmethod=marker:
