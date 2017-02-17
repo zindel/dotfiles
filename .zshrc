@@ -32,6 +32,8 @@ export FONTCONFIG_PATH=/opt/X11/lib/X11/fontconfig
 # {{{ Aliases
 alias pe="pip install -e"
 alias reload=". ~/.zshrc && echo 'ZSH config reloaded from ~/.zshrc'"
+alias tvim="tmux new-window -c \`pwd\` nvim"
+alias vim="nvim"
 # }}}
 
 # {{{ NeoVim as terminal manager (obsolete)
@@ -41,8 +43,8 @@ nv() {
 # }}}
 
 # {{{ OCAML support
-. /Users/zindel/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true
-eval `opam config env`;
+# . /Users/zindel/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true
+# eval `opam config env`;
 # }}}
 
 # {{{ $CHDIR: if set - go there
@@ -54,15 +56,37 @@ fi
 # {{{1 tmux support
 
 # {{{2 'v' command: open nvim in left split or move there
+
 v() {
     [ -z "$TMUX" ] && echo "not in tmux" && exit 1
-    PANE=`tmux list-panes -F "#{pane_index} #{pane_current_command}" | grep nvim | awk '{print $1}'`
+    PANE=`get_vim_pane`
 
-    if [ -n "$PANE" ]; then
-        tmux select-pane -t:.$PANE
-    else
+    if [ -z "$PANE" ]; then
         tmux split-window -h -c `pwd` nvim
+        while [ -z "$PANE" ]; do
+            PANE=`get_vim_pane`
+        done
+        NEW="yes"
+    else
+        NEW=""
     fi
+    tmux select-pane -t:.$PANE
+
+    if [ -n "$1" ]; then
+        if [ -n "$NEW" ]; then
+            CMD=":e"
+        else
+            CMD=":sp"
+        fi
+        echo "$NEW $CMD"
+        tmux send-keys -t:.$PANE Escape "$CMD $(realpath $1)" Enter
+    fi
+}
+
+get_vim_pane() {
+    tmux list-panes -F "#{pane_index} #{pane_current_command}" \
+          | grep nvim \
+          | awk '{print $1}'
 }
 # 2}}}
 
@@ -102,6 +126,51 @@ s() {
 }
 # 2}}}
 
+# {{{2 'fd' command: fancy cd to children paths
+fd() {
+    local dir
+    dir=$(find ${1:-.} -path '*/\.*' -prune \
+					   -o -type d -print 2> /dev/null | fzf +m) && cd "$dir"
+}
+# 2}}}
+
+# {{{2 'fdr' command: fancy cd to selected parent directory
+fdr() {
+  local declare dirs=()
+  get_parent_dirs() {
+    if [[ -d "${1}" ]]; then dirs+=("$1"); else return; fi
+    if [[ "${1}" == '/' ]]; then
+      for _dir in "${dirs[@]}"; do echo $_dir; done
+    else
+      get_parent_dirs $(dirname "$1")
+    fi
+  }
+  local DIR=$(get_parent_dirs $(realpath "${1:-$PWD}") | fzf)
+  cd "$DIR"
+}
+# 2}}}
+
+# {{{2 make sure to workon <env> if session_name == <env>
+if [ -n "$TMUX" ]; then
+    S=`tmux display-message -p '#{session_name}'|tr -d '[:space:]'`
+    if [ -d "$WORKON_HOME/$S" ]; then
+        workon $S
+    fi
+fi
+# 2}}}
+
+
+
+# 1}}}
+
+# {{{1 misc utilities
+# {{{2 'co': list terminal colors
+co() {
+    for i in {0..255}; do
+        printf "\x1b[38;5;${i}mcolour${i}\x1b[0m\n"
+    done
+}
+# 2}}}
 # 1}}}
 
 # vim: foldmethod=marker:

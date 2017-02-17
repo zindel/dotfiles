@@ -1,0 +1,496 @@
+" {{{ NeoBundle
+if has('vim_starting')
+   if &compatible
+     set nocompatible
+   endif
+
+   set runtimepath+=~/.vim/bundle/neobundle.vim/
+endif
+
+" Required:
+call neobundle#begin(expand('~/.vim/bundle/'))
+
+" Let NeoBundle manage NeoBundle
+" Required:
+NeoBundleFetch 'Shougo/neobundle.vim'
+
+" My Bundles here:
+NeoBundle 'altercation/vim-colors-solarized'
+NeoBundle 'jlanzarotta/bufexplorer'
+NeoBundle 'pangloss/vim-javascript'
+NeoBundle 'mxw/vim-jsx'
+NeoBundle 'flowtype/vim-flow', { 'for': 'javascript' }
+NeoBundle 'editorconfig/editorconfig-vim'
+NeoBundle 'exu/pgsql.vim'
+NeoBundle 'w0rp/ale'
+NeoBundle 'ElmCast/elm-vim'
+" NeoBundle 'lambdatoast/elm.vim'
+NeoBundle 'raichoo/purescript-vim'
+NeoBundle 'kchmck/vim-coffee-script'
+NeoBundle 'mattn/webapi-vim'
+NeoBundle 'mattn/gist-vim'
+NeoBundle 'tpope/vim-commentary'
+"NeoBundle 'mileszs/ack.vim'
+NeoBundle 'gcmt/taboo.vim'
+NeoBundle 'rakr/vim-one'
+NeoBundle 'joshdick/onedark.vim'
+NeoBundle 'junegunn/seoul256.vim'
+NeoBundle '/usr/local/opt/fzf'
+NeoBundle 'junegunn/fzf.vim'
+"NeoBundle 'vim-airline/vim-airline'
+
+call neobundle#end()
+filetype plugin indent on
+NeoBundleCheck
+" }}}
+
+" {{{ Basic Options / Mappings
+set nocompatible
+set backspace=indent,eol,start
+syntax on
+filetype plugin indent on
+set history=300
+set ruler		" show the cursor position all the time
+set showcmd		" display incomplete commands
+set incsearch		" do incremental searching
+set hlsearch
+set autoindent		" always set autoindenting on
+set expandtab
+set tabstop=4
+set softtabstop=4
+set sw=4
+set novb
+set noeb
+" brew install reattach-to-user-namespace --wrap-pbcopy-and-pbpaste
+set clipboard=unnamed
+let mapleader=","
+nnoremap <Enter> :nohl<CR>
+" }}}
+
+" {{{ Wrap lines and make arrow keys support it
+set wrap
+nnoremap j gj
+nnoremap k gk
+vnoremap j gj
+vnoremap k gk
+nnoremap <Down> gj
+nnoremap <Up> gk
+vnoremap <Down> gj
+vnoremap <Up> gk
+inoremap <Down> <C-o>gj
+inoremap <Up> <C-o>gk
+" }}}
+
+" {{{ Language specific options
+if executable('ag')
+  let g:ackprg = 'ag --vimgrep'
+endif
+let python_highlight_all = 1
+let g:sql_type_default = 'pgsql'
+" }}}
+
+" {{{ Change directory to match the currently opened file
+function! CHANGE_CURR_DIR()
+    if bufname('%') !~ '^term://'
+        exec "cd %:p:h"
+    endif
+endfunction
+autocmd BufWinEnter * call CHANGE_CURR_DIR()
+autocmd BufEnter * call CHANGE_CURR_DIR()
+autocmd WinEnter * call CHANGE_CURR_DIR()
+autocmd BufReadPost * call CHANGE_CURR_DIR()
+" }}}
+
+" {{{ Tab Autocompletion
+function! TabForward()
+ if col('.')>1 && strpart( getline('.'), col('.')-2, 3 ) =~ '^\w'
+   return "\<C-N>"
+ else
+   return "\<Tab>"
+endfunction
+inoremap <Tab> <C-R>=TabForward()<CR>
+" }}}
+
+" {{{ Remember the cursor position and other details / viminfo
+"
+set viminfo='100,\"200,n~/.nviminfo
+au BufReadPost * if line("'\"") > 0|if line("'\"") <= line("$")|exe("norm '\"")|else|exe "norm $"|endif|endif
+" }}}
+
+" {{{ Backup
+set directory=~/.vimtmp/,.,/tmp
+set nobackup
+set backupdir=/tmp
+set directory=/tmp
+set shell=zsh
+" }}}
+
+" {{{ Theme / styling
+set mouse=a
+set laststatus=2
+set splitright
+set fillchars+=vert:│
+set cmdheight=1
+set t_Co=256
+set cursorline
+
+set bg=dark
+let g:solarized_visibility="high"
+syntax enable
+colorscheme solarized
+hi VertSplit ctermbg=NONE guibg=NONE
+" }}}
+
+" {{{ Trailing whitespace
+set colorcolumn=80
+highlight ExtraWhitespace ctermbg=red guibg=red
+autocmd Syntax * syn match ExtraWhitespace /\s\+$\| \+\ze\t/ containedin=ALL
+" }}}
+
+" {{{ Terminal Settings
+tnoremap <C-w><Left> <C-\><C-n><C-w>h
+tnoremap <C-w><Right> <C-\><C-n><C-w>l
+tnoremap <C-w><Down> <C-\><C-n><C-w>j
+tnoremap <C-w><Up> <C-\><C-n><C-w>k
+tnoremap <ESC><ESC> <C-\><C-n>
+autocmd BufWinEnter,WinEnter term://* startinsert
+
+let g:terminal_scrollback_buffer_size=100000
+
+function! OpenTerminal()
+    if $TMUX !~ '^$'
+        silent exec '!tmux select-pane -L'
+    else
+        let d=expand("%:p:h")
+        sp
+        enew
+        call termopen('CHDIR=' . d . ' zsh')
+        startinsert
+    endif
+endfunction
+
+" }}}
+
+" {{{ FindRepoRoot()
+function! FindRepoRoot()
+    let current = expand('%:p:h')
+    let home = expand("$HOME")
+    while 1
+        if isdirectory(expand(current . "/./.git"))
+        \ || isdirectory(expand(current . "/./.hg"))
+            break
+        endif
+        if current == home
+            break
+        endif
+        let current = fnamemodify(current . "/../", ":p:h")
+    endwhile
+    return current
+endfunction
+" }}}
+
+" {{{ FZF Settings
+
+" ignore .gitignore and .hgignore files
+
+let $FZF_DEFAULT_COMMAND = 'ag -l --nocolor
+      \ --hidden
+      \ --ignore .git
+      \ --ignore .svn
+      \ --ignore .hg
+      \ --ignore .DS_Store
+      \ --ignore coverage
+      \ --ignore build
+      \ --ignore node_modules
+      \ --ignore site-packages
+      \ --ignore "*.egg-info"
+      \ --ignore "**/*.pyc"
+      \ --ignore "*.pyc"
+      \ -g ""'
+
+" make sure fzf quits easily
+:au FileType fzf tnoremap <nowait><buffer> <esc> <c-g>
+
+function! OpenRepoRoot()
+    exe 'Files '. FindRepoRoot()
+endfunction
+
+function! OpenProjects()
+    let current = expand('%:p:h')
+    let home = expand("$HOME")
+    let venv = expand("$HOME/dev")
+    let found = home
+    if current =~ '^'.venv
+        let found = substitute(current, venv . '/', '', '')
+        if found !~ '^/'
+            let found = venv . '/' . substitute(found, '/.*$', '', '') . '/src'
+        endif
+    else
+        let found = expand("$HOME/fun")
+    endif
+    exe 'Files '.found
+endfunction
+
+function! OpenHome()
+    exe 'Files '.expand("$HOME")
+endfunction
+
+nnoremap <C-p> :call OpenRepoRoot()<CR>
+nnoremap <C-b> :Buffers<CR>
+nnoremap <C-f> :Ag 
+nnoremap <C-h> :call OpenHome()<CR>
+nnoremap <C-o> :call OpenProjects()<CR>
+nnoremap <C-t> :Tags<CR>
+
+" }}}
+
+" {{{ Close other windows
+function! WinOnly()
+    while 1
+        let w = winnr()
+        if w == 1
+            let range = "2"
+        else
+            let range = "1"
+        endif
+        let cmd = range . "windo q"
+        try
+            exe cmd
+        catch
+            break
+        endtry
+    endwhile
+endfunction
+
+command! -nargs=0 Wonly call WinOnly()
+command! -nargs=0 Only call WinOnly()
+" }}}
+
+" {{{ Airline
+" let g:airline_powerline_fonts = 1
+" }}}
+
+" {{{ Todo Alias
+command! -nargs=0 Todo exe "sp ~/.todo.md"
+" }}}
+
+" {{{ Ale
+nnoremap <leader>n :ALENextWrap<CR>
+" }}}
+
+" {{{ Elm
+autocmd FileType elm map <buffer> <leader>f :ElmFormat<CR>
+" }}}
+
+" {{{ Run ctags -R saving files
+function! RunCtags()
+    let current = expand('%:p:h')
+    let home = expand("$HOME")
+    let repo = FindRepoRoot()
+
+    if home != repo 
+        let cmd = 'cd ' . repo . ' && ctags -R'
+        call jobstart(cmd)
+    endif
+endfunction
+
+autocmd BufWrite *.elm,*.js,*.py :call RunCtags() 
+" }}}
+
+
+" {{{ Russian Phonetic Mapping
+cmap я q
+cmap Я Q
+nmap я q
+nmap Я Q
+vmap я q
+vmap Я Q
+cmap ш w
+cmap Ш W
+nmap ш w
+nmap Ш W
+vmap ш w
+vmap Ш W
+cmap е e
+cmap Е E
+nmap е e
+nmap Е E
+vmap е e
+vmap Е E
+cmap р r
+cmap Р R
+nmap р r
+nmap Р R
+vmap р r
+vmap Р R
+cmap т t
+cmap Т T
+nmap т t
+nmap Т T
+vmap т t
+vmap Т T
+cmap ы y
+cmap Ы Y
+nmap ы y
+nmap Ы Y
+vmap ы y
+vmap Ы Y
+cmap у u
+cmap У U
+nmap у u
+nmap У U
+vmap у u
+vmap У U
+cmap и i
+cmap И I
+nmap и i
+nmap И I
+vmap и i
+vmap И I
+cmap о o
+cmap О O
+nmap о o
+nmap О O
+vmap о o
+vmap О O
+cmap п p
+cmap П P
+nmap п p
+nmap П P
+vmap п p
+vmap П P
+cmap ю [
+cmap Ю [
+nmap ю [
+nmap Ю [
+vmap ю [
+vmap Ю [
+cmap ж ]
+cmap Ж ]
+nmap ж ]
+nmap Ж ]
+vmap ж ]
+vmap Ж ]
+cmap а a
+cmap А A
+nmap а a
+nmap А A
+vmap а a
+vmap А A
+cmap с s
+cmap С S
+nmap с s
+nmap С S
+vmap с s
+vmap С S
+cmap д d
+cmap Д D
+nmap д d
+nmap Д D
+vmap д d
+vmap Д D
+cmap ф f
+cmap Ф F
+nmap ф f
+nmap Ф F
+vmap ф f
+vmap Ф F
+cmap г g
+cmap Г G
+nmap г g
+nmap Г G
+vmap г g
+vmap Г G
+cmap ч h
+cmap Ч H
+nmap ч h
+nmap Ч H
+vmap ч h
+vmap Ч H
+cmap й j
+cmap Й J
+nmap й j
+nmap Й J
+vmap й j
+vmap Й J
+cmap к k
+cmap К K
+nmap к k
+nmap К K
+vmap к k
+vmap К K
+cmap л l
+cmap Л L
+nmap л l
+nmap Л L
+vmap л l
+vmap Л L
+cmap э \
+cmap Э \
+nmap э \
+nmap Э \
+vmap э \
+vmap Э \
+cmap щ `
+cmap Щ `
+nmap щ `
+nmap Щ `
+vmap щ `
+vmap Щ `
+cmap з z
+cmap З Z
+nmap з z
+nmap З Z
+vmap з z
+vmap З Z
+cmap х x
+cmap Х X
+nmap х x
+nmap Х X
+vmap х x
+vmap Х X
+cmap ц c
+cmap Ц C
+nmap ц c
+nmap Ц C
+vmap ц c
+vmap Ц C
+cmap в v
+cmap В V
+nmap в v
+nmap В V
+vmap в v
+vmap В V
+cmap б b
+cmap Б B
+nmap б b
+nmap Б B
+vmap б b
+vmap Б B
+cmap н n
+cmap Н N
+nmap н n
+nmap Н N
+vmap н n
+vmap Н N
+cmap м m
+cmap М M
+nmap м m
+nmap М M
+vmap м m
+vmap М M
+cmap ь -
+cmap Ь -
+nmap ь -
+nmap Ь -
+vmap ь -
+vmap Ь -
+cmap ъ =
+cmap Ъ =
+nmap ъ =
+nmap Ъ =
+vmap ъ =
+vmap Ъ =
+" }}}
+
+" vim: foldmethod=marker:

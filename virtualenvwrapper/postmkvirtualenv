@@ -9,6 +9,8 @@ uwsgi:
   socket: $VIRTUAL_ENV/socket
 EOF
 
+pip install -U setuptools pip
+
 mkdir $VIRTUAL_ENV/src
 hg clone ssh://hg@bitbucket.org/prometheus/props.build $VIRTUAL_ENV/src/props.build
 pip install -e $VIRTUAL_ENV/src/props.build
