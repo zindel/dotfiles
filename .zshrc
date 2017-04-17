@@ -7,9 +7,10 @@ source $ZSH/oh-my-zsh.sh
 # }}}
 
 # {{{ GLOBAL Environment variables: PATH, LC_ALL, etc
-export PATH="/Users/zindel/bin:/usr/local/texlive/2015basic/bin/x86_64-darwin/:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+export PATH="/Users/zindel/bin:/Users/zindel/.cabal/bin:/usr/local/texlive/2015basic/bin/x86_64-darwin/:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 export LC_ALL=en_US.UTF-8
 export EDITOR=nvim
+export LC_COLLATE=C
 # }}}
 
 # {{{ Prompt
@@ -43,8 +44,8 @@ nv() {
 # }}}
 
 # {{{ OCAML support
-# . /Users/zindel/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true
-# eval `opam config env`;
+. /Users/zindel/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true
+eval `opam config env`;
 # }}}
 
 # {{{ $CHDIR: if set - go there
@@ -78,8 +79,7 @@ v() {
         else
             CMD=":sp"
         fi
-        echo "$NEW $CMD"
-        tmux send-keys -t:.$PANE Escape "$CMD $(realpath $1)" Enter
+        tmux send-keys -t:.$PANE Escape Escape "$CMD $(realpath $1)" Enter
     fi
 }
 
@@ -172,5 +172,22 @@ co() {
 }
 # 2}}}
 # 1}}}
+
+# {{{1 git utilities
+ghpages() {
+    URL=`git config --get remote.origin.url`
+    if [ -n "$URL" ]; then
+        git clone --branch gh-pages --single-branch "$URL" gh-pages
+    fi
+}
+
+ghpublish() {
+    cd gh-pages \
+        && git add -A \
+        && git commit -m 'update pages' \
+        && git push origin gh-pages \
+        && cd ..
+}
+# }}}
 
 # vim: foldmethod=marker:
