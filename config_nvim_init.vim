@@ -19,25 +19,23 @@ NeoBundle 'altercation/vim-colors-solarized'
 NeoBundle 'jlanzarotta/bufexplorer'
 NeoBundle 'pangloss/vim-javascript'
 NeoBundle 'mxw/vim-jsx'
-NeoBundle 'flowtype/vim-flow', { 'for': 'javascript' }
+" NeoBundle 'flowtype/vim-flow', { 'for': 'javascript' }
 NeoBundle 'editorconfig/editorconfig-vim'
 NeoBundle 'exu/pgsql.vim'
 NeoBundle 'w0rp/ale'
 NeoBundle 'ElmCast/elm-vim'
-" NeoBundle 'lambdatoast/elm.vim'
 NeoBundle 'raichoo/purescript-vim'
-NeoBundle 'kchmck/vim-coffee-script'
 NeoBundle 'mattn/webapi-vim'
 NeoBundle 'mattn/gist-vim'
 NeoBundle 'tpope/vim-commentary'
-"NeoBundle 'mileszs/ack.vim'
 NeoBundle 'gcmt/taboo.vim'
 NeoBundle 'rakr/vim-one'
 NeoBundle 'joshdick/onedark.vim'
 NeoBundle 'junegunn/seoul256.vim'
 NeoBundle '/usr/local/opt/fzf'
 NeoBundle 'junegunn/fzf.vim'
-"NeoBundle 'vim-airline/vim-airline'
+" NeoBundle 'vim-airline/vim-airline'
+" NeoBundle 'vim-airline/vim-airline-themes'
 
 call neobundle#end()
 filetype plugin indent on
@@ -51,7 +49,7 @@ syntax on
 filetype plugin indent on
 set history=300
 set ruler		" show the cursor position all the time
-set showcmd		" display incomplete commands
+set noshowcmd		" do not display incomplete commands
 set incsearch		" do incremental searching
 set hlsearch
 set autoindent		" always set autoindenting on
@@ -61,6 +59,8 @@ set softtabstop=4
 set sw=4
 set novb
 set noeb
+language en_US
+
 " brew install reattach-to-user-namespace --wrap-pbcopy-and-pbpaste
 set clipboard=unnamed
 let mapleader=","
@@ -131,14 +131,24 @@ set laststatus=2
 set splitright
 set fillchars+=vert:│
 set cmdheight=1
-set t_Co=256
 set cursorline
 
+" set t_Co=256
+
+
+let &t_ZH="\e[3m"
+let &t_ZR="\e[23m"
+
 set bg=dark
+
 let g:solarized_visibility="high"
 syntax enable
 colorscheme solarized
 hi VertSplit ctermbg=NONE guibg=NONE
+highlight Comment cterm=italic
+
+
+
 " }}}
 
 " {{{ Trailing whitespace
@@ -275,28 +285,101 @@ command! -nargs=0 Todo exe "sp ~/.todo.md"
 " }}}
 
 " {{{ Ale
+nnoremap <leader>o :lopen<CR>
+nnoremap <leader>c :lclose<CR>
 nnoremap <leader>n :ALENextWrap<CR>
+
+let g:ale_linters = {
+\   'javascript': ['eslint'],
+\   'haskell': ['hlint'],
+\}
 " }}}
 
 " {{{ Elm
 autocmd FileType elm map <buffer> <leader>f :ElmFormat<CR>
 " }}}
 
-" {{{ Run ctags -R saving files
+" {{{ Run ctags -R when saving files
 function! RunCtags()
     let current = expand('%:p:h')
     let home = expand("$HOME")
     let repo = FindRepoRoot()
 
-    if home != repo 
-        let cmd = 'cd ' . repo . ' && ctags -R'
+    if home != repo
+        let cmd = 'cd ' . repo . ' && ctags -R --sort=yes'
         call jobstart(cmd)
     endif
 endfunction
 
-autocmd BufWrite *.elm,*.js,*.py :call RunCtags() 
+autocmd BufWrite *.yaml,*.elm,*.js,*.py :call RunCtags()
 " }}}
 
+" {{{ Prettier
+function! Prettier()
+    let save_cursor = getpos(".")
+    exe "normal! gggqG"
+    if v:shell_error
+        let line = getline(1)
+        undo
+        echo line
+    else
+        write
+    endif
+
+    call setpos('.', save_cursor)
+endfunction
+
+autocmd FileType javascript set formatprg=prettier\ --stdin
+autocmd FileType javascript nnoremap <buffer> <leader>f :call Prettier()<CR>
+" }}}
+
+" {{{ Indent Guides
+" let g:indent_guides_autocmds_enabled = 1
+" let g:indent_guides_guide_size = 1
+" let g:indent_guides_enable_on_vim_startup = 1
+" let g:indent_guides_auto_colors = 1
+" let g:indent_guides_color_change_percent = 50
+" let g:indent_guides_exclude_filetypes = ['javascript', 'help']
+" }}}
+
+" {{{ OCAML Support
+
+let g:opamshare = substitute(system('opam config var share'),'\n$','','''')
+execute "set rtp+=" . g:opamshare . "/merlin/vim"
+
+" ## added by OPAM user-setup for vim / base ## 93ee63e278bdfc07d1139a748ed3fff2 ## you can edit, but keep this line
+" let s:opam_share_dir = system("opam config var share")
+" let s:opam_share_dir = substitute(s:opam_share_dir, '[\r\n]*$', '', '')
+
+" let s:opam_configuration = {}
+
+" function! OpamConfOcpIndent()
+"   execute "set rtp^=" . s:opam_share_dir . "/ocp-indent/vim"
+" endfunction
+" let s:opam_configuration['ocp-indent'] = function('OpamConfOcpIndent')
+
+" function! OpamConfOcpIndex()
+"   execute "set rtp+=" . s:opam_share_dir . "/ocp-index/vim"
+" endfunction
+" let s:opam_configuration['ocp-index'] = function('OpamConfOcpIndex')
+
+" function! OpamConfMerlin()
+"   let l:dir = s:opam_share_dir . "/merlin/vim"
+"   execute "set rtp+=" . l:dir
+" endfunction
+" let s:opam_configuration['merlin'] = function('OpamConfMerlin')
+
+" let s:opam_packages = ["ocp-indent", "ocp-index", "merlin"]
+" let s:opam_check_cmdline = ["opam list --installed --short --safe --color=never"] + s:opam_packages
+" let s:opam_available_tools = split(system(join(s:opam_check_cmdline)))
+" for tool in s:opam_packages
+"   " Respect package order (merlin should be after ocp-index)
+"   if count(s:opam_available_tools, tool) > 0
+"     call s:opam_configuration[tool]()
+"   endif
+" endfor
+" ## end of OPAM user-setup addition for vim / base ## keep this line
+" }}}
 
 " {{{ Russian Phonetic Mapping
 cmap я q
