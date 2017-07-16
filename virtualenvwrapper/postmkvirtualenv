@@ -10,6 +10,7 @@ uwsgi:
 EOF
 
 pip install -U setuptools pip
+pip install sphinx==1.4
 
 mkdir $VIRTUAL_ENV/src
 hg clone ssh://hg@bitbucket.org/prometheus/props.build $VIRTUAL_ENV/src/props.build

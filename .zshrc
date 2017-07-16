@@ -7,7 +7,7 @@ source $ZSH/oh-my-zsh.sh
 # }}}
 
 # {{{ GLOBAL Environment variables: PATH, LC_ALL, etc
-export PATH="/Users/zindel/bin:/Users/zindel/.cabal/bin:/usr/local/texlive/2015basic/bin/x86_64-darwin/:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+export PATH="/Users/zindel/bin:/Users/zindel/.local/bin:/Users/zindel/.cabal/bin:/usr/local/texlive/2015basic/bin/x86_64-darwin/:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 export LC_ALL=en_US.UTF-8
 export EDITOR=nvim
 export LC_COLLATE=C
