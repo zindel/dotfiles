@@ -7,7 +7,7 @@ source $ZSH/oh-my-zsh.sh
 # }}}
 
 # {{{ GLOBAL Environment variables: PATH, LC_ALL, etc
-export PATH="/Users/zindel/bin:/Users/zindel/.local/bin:/Users/zindel/.cabal/bin:/usr/local/texlive/2015basic/bin/x86_64-darwin/:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+export PATH="/Users/zindel/bin:/Users/zindel/.local/bin:/Users/zindel/.cabal/bin:/usr/local/texlive/2015basic/bin/x86_64-darwin/:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
 export LC_ALL=en_US.UTF-8
 export EDITOR=nvim
 export LC_COLLATE=C
@@ -35,17 +35,17 @@ alias pe="pip install -e"
 alias reload=". ~/.zshrc && echo 'ZSH config reloaded from ~/.zshrc'"
 alias tvim="tmux new-window -c \`pwd\` nvim"
 alias vim="nvim"
-# }}}
 
-# {{{ NeoVim as terminal manager (obsolete)
-nv() {
-    nvim -c 'exe ":set nosplitright | :vsplit | :set splitright | :terminal"'
-}
+alias fpack=/Users/zindel/ocaml/fastpack/_build/default/bin/fpack.exe
 # }}}
 
 # {{{ OCAML support
-. /Users/zindel/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true
-eval `opam config env`;
+# . /Users/zindel/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true
+# eval `opam config env`;
+# }}}
+
+# {{{ Rust support
+source $HOME/.cargo/env
 # }}}
 
 # {{{ $CHDIR: if set - go there
@@ -56,14 +56,28 @@ fi
 
 # {{{1 tmux support
 
-# {{{2 'v' command: open nvim in left split or move there
+# {{{2 make sure to workon <env> if session_name == <env>
+if [ -n "$TMUX" ]; then
+    S=`tmux display-message -p '#{session_name}'|tr -d '[:space:]'`
+    if [ -d "$WORKON_HOME/$S" ]; then
+        workon $S
+    fi
+fi
+# 2}}}
+
+# {{{2 'v' command: open nvim in the right split or move there
 
 v() {
     [ -z "$TMUX" ] && echo "not in tmux" && exit 1
     PANE=`get_vim_pane`
 
     if [ -z "$PANE" ]; then
-        tmux split-window -h -c `pwd` nvim
+        CMD='nvim'
+        if [ -f esy.lock ]; then CMD='esy nvim'; fi
+
+        #
+        CMD="VIRTUAL_ENV=$VIRTUAL_ENV $CMD"
+        tmux split-window -h -c `pwd` $CMD
         while [ -z "$PANE" ]; do
             PANE=`get_vim_pane`
         done
@@ -85,7 +99,7 @@ v() {
 
 get_vim_pane() {
     tmux list-panes -F "#{pane_index} #{pane_current_command}" \
-          | grep nvim \
+          | grep "nvim\|bash\|esyCommand" \
           | awk '{print $1}'
 }
 # 2}}}
@@ -150,16 +164,6 @@ fdr() {
 }
 # 2}}}
 
-# {{{2 make sure to workon <env> if session_name == <env>
-if [ -n "$TMUX" ]; then
-    S=`tmux display-message -p '#{session_name}'|tr -d '[:space:]'`
-    if [ -d "$WORKON_HOME/$S" ]; then
-        workon $S
-    fi
-fi
-# 2}}}
-
-
 
 # 1}}}
 
@@ -169,6 +173,18 @@ co() {
     for i in {0..255}; do
         printf "\x1b[38;5;${i}mcolour${i}\x1b[0m\n"
     done
+}
+
+dusort () {
+    du -hs * | gsort -rh
+}
+
+# fd - cd to selected directory
+fd() {
+  local dir
+  dir=$(find ${1:-.} -path '*/\.*' -prune \
+                  -o -type d -print 2> /dev/null | fzf +m) &&
+  cd "$dir"
 }
 # 2}}}
 # 1}}}
@@ -189,5 +205,7 @@ ghpublish() {
         && cd ..
 }
 # }}}
+
+
 
 # vim: foldmethod=marker:

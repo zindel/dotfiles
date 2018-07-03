@@ -20,7 +20,7 @@ indent_size = 4
 [Makefile]
 indent_style = tab
 
-[*.{js,yaml,html,rst,htsql,ml,mli}]
+[*.{js,jsx,ts,tsx,yaml,html,rst,htsql,ml,mli}]
 indent_style = space
 indent_size = 2
 charset = utf-8

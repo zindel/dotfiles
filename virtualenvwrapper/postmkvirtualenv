@@ -7,6 +7,7 @@ parameters:
   attach_dir: /Users/zindel/tmp/files
 uwsgi:
   socket: $VIRTUAL_ENV/socket
+  chmod-socket: 777
 EOF
 
 pip install -U setuptools pip

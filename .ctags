@@ -4,6 +4,7 @@
 --exclude=node_modules
 --exclude=build
 --exclude=bundle
+--exclude=_build
 
 --langdef=Elm
 --langmap=Elm:.elm

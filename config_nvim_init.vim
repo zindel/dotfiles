@@ -34,8 +34,19 @@ NeoBundle 'joshdick/onedark.vim'
 NeoBundle 'junegunn/seoul256.vim'
 NeoBundle '/usr/local/opt/fzf'
 NeoBundle 'junegunn/fzf.vim'
-" NeoBundle 'vim-airline/vim-airline'
-" NeoBundle 'vim-airline/vim-airline-themes'
+NeoBundle 'rust-lang/rust.vim'
+NeoBundle 'reasonml-editor/vim-reason'
+" NeoBundle 'autozimu/LanguageClient-neovim', {
+"     \ 'branch': 'next',
+"     \ 'do': './install.sh'
+"     \ }
+" NeoBundle 'reasonml-editor/vim-reason-plus'
+NeoBundle 'chr4/nginx.vim'
+NeoBundle 'let-def/ocp-indent-vim'
+NeoBundle 'andreypopp/vim-colors-plain'
+NeoBundle 'andreypopp/fzf-merlin'
+" NeoBundle 'lifepillar/vim-mucomplete'
+" NeoBundle 'davidhalter/jedi-vim'
 
 call neobundle#end()
 filetype plugin indent on
@@ -62,7 +73,10 @@ set noeb
 language en_US
 
 " brew install reattach-to-user-namespace --wrap-pbcopy-and-pbpaste
-set clipboard=unnamed
+
+if !exists("g:gui_oni")
+  set clipboard=unnamed
+endif
 let mapleader=","
 nnoremap <Enter> :nohl<CR>
 " }}}
@@ -109,6 +123,18 @@ function! TabForward()
    return "\<Tab>"
 endfunction
 inoremap <Tab> <C-R>=TabForward()<CR>
+
+" set completeopt+=noselect
+" set completeopt+=noinsert
+set noshowmode shortmess+=c
+set noinfercase
+set wrapscan
+" set complete-=t
+" set complete-=u
+" let g:mucomplete#chains = {'default' : ['omni', 'c-n', 'path'] }
+" let g:mucomplete#enable_auto_at_startup = 1
+
+
 " }}}
 
 " {{{ Remember the cursor position and other details / viminfo
@@ -133,36 +159,34 @@ set fillchars+=vert:│
 set cmdheight=1
 set cursorline
 
-" set t_Co=256
 
 
+set t_Co=256
 let &t_ZH="\e[3m"
 let &t_ZR="\e[23m"
 
 " " For Neovim 0.1.3 and 0.1.4
 " let $NVIM_TUI_ENABLE_TRUE_COLOR=1
 
-" " Or if you have Neovim >= 0.1.5
-" if (has("termguicolors"))
-"  set termguicolors
-" endif
 
 syntax enable
 
-set bg=dark
+" set bg=dark
+" let g:solarized_visibility="high"
+" colorscheme solarized
 
-let g:solarized_visibility="high"
-colorscheme solarized
+" Or if you have Neovim >= 0.1.5
+if (has("termguicolors"))
+ set termguicolors
+endif
+set bg=light
+colorscheme plain
 
-" if (has("autocmd") && !has("gui_running"))
-"   let s:white = { "gui": "#ABB2BF", "cterm": "145", "cterm16" : "7" }
-"   autocmd ColorScheme * call onedark#set_highlight("Normal", { "fg": s:white }) " No `bg` setting
-" end
-" let g:onedark_terminal_italics=1
-" colorscheme onedark
 
 hi VertSplit ctermbg=NONE guibg=NONE
 highlight Comment cterm=italic
+highlight StatusLine cterm=bold
+
 
 
 
@@ -196,6 +220,15 @@ function! OpenTerminal()
     endif
 endfunction
 
+" }}}
+
+" {{{ Python
+if $VIRTUAL_ENV !~ '^$'
+    " let g:python2_host_prog = '/usr/local/bin/python'
+    let g:python2_host_prog = $VIRTUAL_ENV . '/bin/python'
+else
+    let g:python2_host_prog = '/usr/local/bin/python'
+endif
 " }}}
 
 " {{{ FindRepoRoot()
@@ -312,13 +345,23 @@ nnoremap <leader>c :lclose<CR>
 nnoremap <leader>n :ALENextWrap<CR>
 
 let g:ale_linters = {
+\   'ocaml': ['merlin'],
+\   'reason': ['merlin'],
 \   'javascript': ['eslint'],
 \   'haskell': ['hlint'],
+\   'python': [],
 \}
+
+let g:ale_lint_on_save = 1
+let g:ale_lint_on_text_changed = 0
 " }}}
 
 " {{{ Elm
 autocmd FileType elm map <buffer> <leader>f :ElmFormat<CR>
+" }}}
+
+" {{{ JavaScript
+let g:javascript_plugin_flow = 1
 " }}}
 
 " {{{ Run ctags -R when saving files
@@ -333,7 +376,7 @@ function! RunCtags()
     endif
 endfunction
 
-autocmd BufWrite *.yaml,*.elm,*.js,*.py :call RunCtags()
+autocmd BufWrite *.yaml,*.elm,*.js,*.py,*.ml :call RunCtags()
 " }}}
 
 " {{{ Prettier
@@ -351,7 +394,7 @@ function! Prettier()
     call setpos('.', save_cursor)
 endfunction
 
-autocmd FileType javascript set formatprg=prettier\ --stdin
+autocmd FileType javascript setlocal formatprg=prettier\ --stdin
 autocmd FileType javascript nnoremap <buffer> <leader>f :call Prettier()<CR>
 " }}}
 
@@ -370,39 +413,76 @@ autocmd FileType javascript nnoremap <buffer> <leader>f :call Prettier()<CR>
 " execute "set rtp+=" . g:opamshare . "/merlin/vim"
 
 " ## added by OPAM user-setup for vim / base ## 93ee63e278bdfc07d1139a748ed3fff2 ## you can edit, but keep this line
-let s:opam_share_dir = system("opam config var share")
-let s:opam_share_dir = substitute(s:opam_share_dir, '[\r\n]*$', '', '')
+" let s:opam_share_dir = system("opam config var share")
+" let s:opam_share_dir = substitute(s:opam_share_dir, '[\r\n]*$', '', '')
 
-let s:opam_configuration = {}
+" let s:opam_configuration = {}
 
-function! OpamConfOcpIndent()
-  execute "set rtp^=" . s:opam_share_dir . "/ocp-indent/vim"
-endfunction
-let s:opam_configuration['ocp-indent'] = function('OpamConfOcpIndent')
+" function! OpamConfOcpIndent()
+"   execute "set rtp^=" . s:opam_share_dir . "/ocp-indent/vim"
+" endfunction
+" let s:opam_configuration['ocp-indent'] = function('OpamConfOcpIndent')
 
-function! OpamConfOcpIndex()
-  execute "set rtp+=" . s:opam_share_dir . "/ocp-index/vim"
-endfunction
-let s:opam_configuration['ocp-index'] = function('OpamConfOcpIndex')
+" function! OpamConfOcpIndex()
+"   execute "set rtp+=" . s:opam_share_dir . "/ocp-index/vim"
+" endfunction
+" let s:opam_configuration['ocp-index'] = function('OpamConfOcpIndex')
 
-function! OpamConfMerlin()
-  let l:dir = s:opam_share_dir . "/merlin/vim"
-  execute "set rtp+=" . l:dir
-endfunction
-let s:opam_configuration['merlin'] = function('OpamConfMerlin')
+" function! OpamConfMerlin()
+"   let l:dir = s:opam_share_dir . "/merlin/vim"
+"   execute "set rtp+=" . l:dir
+" endfunction
+" let s:opam_configuration['merlin'] = function('OpamConfMerlin')
 
-let s:opam_packages = ["ocp-indent", "ocp-index", "merlin"]
-let s:opam_check_cmdline = ["opam list --installed --short --safe --color=never"] + s:opam_packages
-let s:opam_available_tools = split(system(join(s:opam_check_cmdline)))
-for tool in s:opam_packages
-  " Respect package order (merlin should be after ocp-index)
-  if count(s:opam_available_tools, tool) > 0
-    call s:opam_configuration[tool]()
-  endif
-endfor
+" let s:opam_packages = ["ocp-indent", "ocp-index", "merlin"]
+" let s:opam_check_cmdline = ["opam list --installed --short --safe --color=never"] + s:opam_packages
+" let s:opam_available_tools = split(system(join(s:opam_check_cmdline)))
+" for tool in s:opam_packages
+"   " Respect package order (merlin should be after ocp-index)
+"   if count(s:opam_available_tools, tool) > 0
+"     call s:opam_configuration[tool]()
+"   endif
+" endfor
 " ## end of OPAM user-setup addition for vim / base ## keep this line
 "
 autocmd FileType ocaml setlocal commentstring=(*%s*)
+
+let g:merlin_type_history_auto_open = 0
+
+autocmd FileType ocaml,reason nnoremap <leader>t :MerlinTypeOf<CR>
+autocmd FileType ocaml,reason nnoremap <leader>d :MerlinDestruct<CR>
+autocmd FileType ocaml,reason nnoremap <leader>l :MerlinLocate<CR>
+autocmd FileType ocaml,reason nnoremap <leader><Enter> :MerlinClearEnclosing<CR>
+" }}}
+
+" {{{ Python
+" }}}
+
+" {{{ Language Server: Reason, OCaml
+let g:LanguageClient_serverCommands = {
+    \ 'reason': ['ocaml-language-server', '--stdio'],
+    \ 'ocaml': ['ocaml-language-server', '--stdio'],
+    \ }
+" }}}
+
+
+
+" let g:indentLine_setColors = 0
+" let g:indentLine_char = '┆'
+" let g:indentLine_char = '¦'
+" let g:indentLine_char = '·'
+
+let $NVIM_TUI_ENABLE_CURSOR_SHAPE=1
+
+" {{{ Language Server
+" if executable('pyls')
+"     " pip install python-language-server
+"     au User lsp_setup call lsp#register_server({
+"         \ 'name': 'pyls',
+"         \ 'cmd': ['pyls'],
+"         \ 'whitelist': ['python'],
+"         \ })
+" endif
 " }}}
 
 " {{{ Russian Phonetic Mapping
@@ -599,5 +679,8 @@ nmap Ъ =
 vmap ъ =
 vmap Ъ =
 " }}}
+
+set exrc
+set secure
 
 " vim: foldmethod=marker:
