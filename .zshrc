@@ -73,7 +73,7 @@ v() {
 
     if [ -z "$PANE" ]; then
         CMD='nvim'
-        if [ -f esy.lock ]; then CMD='esy nvim'; fi
+        if [ -f esy.lock ] || [ -f esyi.lock.json ]; then CMD='esy nvim'; fi
 
         #
         CMD="VIRTUAL_ENV=$VIRTUAL_ENV $CMD"
@@ -187,6 +187,18 @@ fd() {
   cd "$dir"
 }
 # 2}}}
+
+
+fzf-file-widget() {
+  LBUFFER="${LBUFFER}$(__fsel)"
+  local ret=$?
+  zle redisplay
+  typeset -f zle-line-init >/dev/null && zle zle-line-init
+  return $ret
+}
+zle     -N   fzf-file-widget
+bindkey '^T' fzf-file-widget
+
 # 1}}}
 
 # {{{1 git utilities

@@ -347,7 +347,7 @@ nnoremap <leader>n :ALENextWrap<CR>
 let g:ale_linters = {
 \   'ocaml': ['merlin'],
 \   'reason': ['merlin'],
-\   'javascript': ['eslint'],
+\   'javascript': ['flow', 'eslint'],
 \   'haskell': ['hlint'],
 \   'python': [],
 \}
