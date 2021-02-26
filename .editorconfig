@@ -20,10 +20,11 @@ indent_size = 4
 [Makefile]
 indent_style = tab
 
-[*.{js,jsx,ts,tsx,yaml,html,rst,htsql,ml,mli}]
+[*.{js,jsx,ts,tsx,yaml,yml,html,rst,htsql,ml,mli,re,rei,css,sass,less}]
 indent_style = space
 indent_size = 2
 charset = utf-8
+max_line_length = 80
 
 # Matches the exact files either package.json or .travis.yml
 [{package.json,.travis.yml}]

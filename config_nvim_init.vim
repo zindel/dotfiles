@@ -1,56 +1,71 @@
-" {{{ NeoBundle
-if has('vim_starting')
-   if &compatible
-     set nocompatible
-   endif
+" {{{ Plugins
+" if has('vim_starting')
+"    if &compatible
+"      set nocompatible
+"    endif
 
-   set runtimepath+=~/.vim/bundle/neobundle.vim/
-endif
+"    set runtimepath+=~/.vim/bundle/neobundle.vim/
+" endif
+" set rtp+=~/.vim/bundle/fzf/
 
-" Required:
-call neobundle#begin(expand('~/.vim/bundle/'))
+" " Required:
+" call neobundle#begin(expand('~/.vim/bundle/'))
 
-" Let NeoBundle manage NeoBundle
-" Required:
-NeoBundleFetch 'Shougo/neobundle.vim'
+" " Required:
+" NeoBundleFetch 'Shougo/neobundle.vim'
+set rtp+=/usr/local/opt/fzf
+
+call plug#begin('~/.vim/plugged')
 
 " My Bundles here:
-NeoBundle 'altercation/vim-colors-solarized'
-NeoBundle 'jlanzarotta/bufexplorer'
-NeoBundle 'pangloss/vim-javascript'
-NeoBundle 'mxw/vim-jsx'
-" NeoBundle 'flowtype/vim-flow', { 'for': 'javascript' }
-NeoBundle 'editorconfig/editorconfig-vim'
-NeoBundle 'exu/pgsql.vim'
-NeoBundle 'w0rp/ale'
-NeoBundle 'ElmCast/elm-vim'
-NeoBundle 'raichoo/purescript-vim'
-NeoBundle 'mattn/webapi-vim'
-NeoBundle 'mattn/gist-vim'
-NeoBundle 'tpope/vim-commentary'
-NeoBundle 'gcmt/taboo.vim'
-NeoBundle 'rakr/vim-one'
-NeoBundle 'joshdick/onedark.vim'
-NeoBundle 'junegunn/seoul256.vim'
-NeoBundle '/usr/local/opt/fzf'
-NeoBundle 'junegunn/fzf.vim'
-NeoBundle 'rust-lang/rust.vim'
-NeoBundle 'reasonml-editor/vim-reason'
-" NeoBundle 'autozimu/LanguageClient-neovim', {
+Plug 'altercation/vim-colors-solarized'
+Plug 'jlanzarotta/bufexplorer'
+Plug 'pangloss/vim-javascript'
+Plug 'mxw/vim-jsx'
+Plug 'editorconfig/editorconfig-vim'
+Plug 'exu/pgsql.vim'
+Plug 'dense-analysis/ale'
+Plug 'mattn/webapi-vim'
+Plug 'mattn/gist-vim'
+Plug 'tpope/vim-commentary'
+Plug '/usr/local/opt/fzf'
+Plug 'junegunn/fzf.vim'
+Plug 'rust-lang/rust.vim'
+Plug 'andreypopp/vim-reason'
+Plug 'chr4/nginx.vim'
+Plug 'let-def/ocp-indent-vim'
+Plug 'andreypopp/vim-colors-plain'
+Plug 'andreypopp/fzf-merlin'
+
+" Plug 'slashmili/alchemist.vim'
+" Plug 'elixir-editors/vim-elixir'
+" Plug 'Galooshi/vim-import-js'
+" Plug 'leafgarland/typescript-vim'
+" Plug 'reasonml-editor/vim-reason'
+" Plug 'reasonml-editor/vim-reason-legacy'
+" Plug 'flowtype/vim-flow', { 'for': 'javascript' }
+" Plug 'andreypopp/ale'
+" Plug 'ElmCast/elm-vim'
+" Plug 'raichoo/purescript-vim'
+" Plug 'gcmt/taboo.vim'
+" Plug 'rakr/vim-one'
+" Plug 'joshdick/onedark.vim'
+" Plug 'junegunn/seoul256.vim'
+" Plug 'jordwalke/vim-reasonml'
+" Plug 'autozimu/LanguageClient-neovim', {
 "     \ 'branch': 'next',
 "     \ 'do': './install.sh'
 "     \ }
-" NeoBundle 'reasonml-editor/vim-reason-plus'
-NeoBundle 'chr4/nginx.vim'
-NeoBundle 'let-def/ocp-indent-vim'
-NeoBundle 'andreypopp/vim-colors-plain'
-NeoBundle 'andreypopp/fzf-merlin'
-" NeoBundle 'lifepillar/vim-mucomplete'
-" NeoBundle 'davidhalter/jedi-vim'
+" Plug 'reasonml-editor/vim-reason-plus'
+" Plug 'zindel/vim-colors-plain'
 
-call neobundle#end()
+
+" call neobundle#end()
+call plug#end()
+
 filetype plugin indent on
-NeoBundleCheck
+" NeoBundleCheck
+
 " }}}
 
 " {{{ Basic Options / Mappings
@@ -83,16 +98,16 @@ nnoremap <Enter> :nohl<CR>
 
 " {{{ Wrap lines and make arrow keys support it
 set wrap
-nnoremap j gj
-nnoremap k gk
-vnoremap j gj
-vnoremap k gk
-nnoremap <Down> gj
-nnoremap <Up> gk
-vnoremap <Down> gj
-vnoremap <Up> gk
-inoremap <Down> <C-o>gj
-inoremap <Up> <C-o>gk
+" nnoremap j gj
+" nnoremap k gk
+" vnoremap j gj
+" vnoremap k gk
+" nnoremap <Down> gj
+" nnoremap <Up> gk
+" vnoremap <Down> gj
+" vnoremap <Up> gk
+" inoremap <Down> <C-o>gj
+" inoremap <Up> <C-o>gk
 " }}}
 
 " {{{ Language specific options
@@ -152,7 +167,7 @@ set shell=zsh
 " }}}
 
 " {{{ Theme / styling
-set mouse=a
+set mouse=
 set laststatus=2
 set splitright
 set fillchars+=vert:│
@@ -169,23 +184,32 @@ let &t_ZR="\e[23m"
 " let $NVIM_TUI_ENABLE_TRUE_COLOR=1
 
 
+
 syntax enable
 
+" set list listchars=tab:»·,trail:·
+
 " set bg=dark
-" let g:solarized_visibility="high"
-" colorscheme solarized
+set bg=dark
+let g:solarized_visibility="high"
+colorscheme solarized
+
+highlight ExtraWhitespace ctermbg=red guibg=red
+autocmd Syntax * syn match ExtraWhitespace /\s\+$\| \+\ze\t/ containedin=ALL
 
 " Or if you have Neovim >= 0.1.5
-if (has("termguicolors"))
- set termguicolors
-endif
-set bg=light
-colorscheme plain
+" if (has("termguicolors"))
+"  set termguicolors
+" endif
+
+" set bg=light
+" colorscheme plain
+" highlight StatusLine gui=underline,bold guifg=#545454
+" highlight StatusLineNC gui=underline guifg=#767676
 
 
 hi VertSplit ctermbg=NONE guibg=NONE
 highlight Comment cterm=italic
-highlight StatusLine cterm=bold
 
 
 
@@ -194,41 +218,34 @@ highlight StatusLine cterm=bold
 
 " {{{ Trailing whitespace
 set colorcolumn=80
-highlight ExtraWhitespace ctermbg=red guibg=red
-autocmd Syntax * syn match ExtraWhitespace /\s\+$\| \+\ze\t/ containedin=ALL
-" }}}
+" highlight ExtraWhitespace ctermbg=red guibg=red
+" autocmd Syntax * syn match ExtraWhitespace /\s\+$\| \+\ze\t/ containedin=ALL
+let g:toggleHighlightWhitespace = 1
+function! ToggleHighlightWhitespace(...)
+  if a:0 == 1 "toggle behaviour
+    let g:toggleHighlightWhitespace = 1 - g:toggleHighlightWhitespace
+  endif
 
-" {{{ Terminal Settings
-tnoremap <C-w><Left> <C-\><C-n><C-w>h
-tnoremap <C-w><Right> <C-\><C-n><C-w>l
-tnoremap <C-w><Down> <C-\><C-n><C-w>j
-tnoremap <C-w><Up> <C-\><C-n><C-w>k
-tnoremap <ESC><ESC> <C-\><C-n>
-autocmd BufWinEnter,WinEnter term://* startinsert
-
-let g:terminal_scrollback_buffer_size=100000
-
-function! OpenTerminal()
-    if $TMUX !~ '^$'
-        silent exec '!tmux select-pane -L'
-    else
-        let d=expand("%:p:h")
-        sp
-        enew
-        call termopen('CHDIR=' . d . ' zsh')
-        startinsert
-    endif
+  if g:toggleHighlightWhitespace == 1 "normal action, do the hi
+    highlight ExtraWhitespace ctermbg=red guibg=red
+    match ExtraWhitespace /\s\+$/
+    autocmd BufWinEnter * match ExtraWhitespace /\s\+$/
+    autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
+    autocmd InsertLeave * match ExtraWhitespace /\s\+$/
+    autocmd BufWinLeave * call clearmatches()
+  else
+    call clearmatches()
+  endif
 endfunction
 
+" autocmd BufWinEnter * call ToggleHighlightWhitespace()
+" autocmd InsertEnter * call ToggleHighlightWhitespace()
+" autocmd InsertLeave * call ToggleHighlightWhitespace()
+" autocmd BufWinLeave * call ToggleHighlightWhitespace()
 " }}}
 
 " {{{ Python
-if $VIRTUAL_ENV !~ '^$'
-    " let g:python2_host_prog = '/usr/local/bin/python'
-    let g:python2_host_prog = $VIRTUAL_ENV . '/bin/python'
-else
-    let g:python2_host_prog = '/usr/local/bin/python'
-endif
+let g:python3_host_prog = '/usr/local/bin/python'
 " }}}
 
 " {{{ FindRepoRoot()
@@ -291,6 +308,7 @@ let $FZF_DEFAULT_COMMAND = 'ag -l --nocolor
       \ -g ""'
 
 " make sure fzf quits easily
+
 :au FileType fzf tnoremap <nowait><buffer> <esc> <c-g>
 
 function! OpenRepoRoot()
@@ -321,18 +339,15 @@ nnoremap <C-p> :call OpenRepoRoot()<CR>
 nnoremap <C-b> :Buffers<CR>
 nnoremap <C-f> :Ag 
 nnoremap <C-h> :call OpenHome()<CR>
-nnoremap <C-o> :call OpenProjects()<CR>
+" nnoremap <C-o> :call OpenProjects()<CR>
 nnoremap <C-t> :Tags<CR>
+nnoremap <C-l> :Lines<CR>
 
 " }}}
 
 " {{{ Close other windows
 command! -nargs=0 Wonly :only
 command! -nargs=0 Only :only
-" }}}
-
-" {{{ Airline
-" let g:airline_powerline_fonts = 1
 " }}}
 
 " {{{ Todo Alias
@@ -344,16 +359,88 @@ nnoremap <leader>o :lopen<CR>
 nnoremap <leader>c :lclose<CR>
 nnoremap <leader>n :ALENextWrap<CR>
 
+" let g:ale_lint_on_save = 1
+" let g:ale_lint_on_text_changed = 0
+let g:ale_ignore_2_4_warnings = 1
+
+" Write this in your vimrc file
+let g:ale_lint_on_text_changed = 'never'
+let g:ale_lint_on_insert_leave = 0
+" let g:ale_lint_on_enter = 0
+
+" --- snippet
+
+" function! s:executable_callback(buffer) abort
+"   echom "executable_callback!"
+"   return 'true'
+" endfunction
+
+" function! s:get_command(buffer) abort
+"   let l:abspath = expand('#' . string(a:buffer) . ':p')
+"   let l:filetype = getbufvar(a:buffer, '&filetype')
+"   echom "get_command!"
+"   echom l:abspath
+"   echom l:filetype
+
+"   if (l:abspath =~ 'ahrefs/merlin3')
+"       echom "DUNE"
+"       return 'dune exec -p merlin-lsp -- ocamlmerlin-lsp'
+"   endif
+
+"   " BuckleScript OCaml 4.02
+"   if (l:abspath =~ 'ahrefs/frontend' && l:filetype == 'reason')
+"       return '/Users/zindel/ahrefs/merlin-opam/_build/install/default/bin/ocamlmerlin-lsp'
+"   endif
+
+"   " fallback is esy
+"   return 'ocamlmerlin-lsp'
+" endfunction
+
+" function! s:get_language(buffer) abort
+"   " echom "get_command!"
+"   return getbufvar(a:buffer, '&filetype')
+" endfunction
+
+" function! s:get_project_root(buffer) abort
+"   let l:package_json = ale#path#FindNearestFile(a:buffer, 'package.json')
+"   let l:git = ale#path#FindNearestDirectory(a:buffer, '.git')
+"   let l:path = !empty(l:package_json) ? fnamemodify(l:package_json, ':h') : (!empty(l:git) ? fnamemodify(fnamemodify(l:git, ':h'), ':h'): '')
+"   echom "get_project_root"
+"   echom l:path
+"   return l:path
+" endfunction
+
+" call ale#linter#Define('ocaml', {
+" \   'name': 'merlin-lsp',
+" \   'lsp': 'stdio',
+" \   'executable_callback': function('s:executable_callback'),
+" \   'command_callback': function('s:get_command'),
+" \   'language_callback': function('s:get_language'),
+" \   'project_root_callback': function('s:get_project_root')
+" \})
+
+" call ale#linter#Define('reason', {
+" \   'name': 'merlin-lsp',
+" \   'lsp': 'stdio',
+" \   'executable_callback': function('s:executable_callback'),
+" \   'command_callback': function('s:get_command'),
+" \   'language_callback': function('s:get_language'),
+" \   'project_root_callback': function('s:get_project_root')
+" \})
+
+" --- snippet
+
+
+
 let g:ale_linters = {
 \   'ocaml': ['merlin'],
 \   'reason': ['merlin'],
-\   'javascript': ['flow', 'eslint'],
+\   'javascript': ['flow'],
+\   'javascript.jsx': ['flow'],
 \   'haskell': ['hlint'],
 \   'python': [],
 \}
 
-let g:ale_lint_on_save = 1
-let g:ale_lint_on_text_changed = 0
 " }}}
 
 " {{{ Elm
@@ -394,7 +481,7 @@ function! Prettier()
     call setpos('.', save_cursor)
 endfunction
 
-autocmd FileType javascript setlocal formatprg=prettier\ --stdin
+autocmd FileType javascript setlocal formatprg=prettier\ --stdin-filepath\ %\ --stdin
 autocmd FileType javascript nnoremap <buffer> <leader>f :call Prettier()<CR>
 " }}}
 
@@ -409,41 +496,45 @@ autocmd FileType javascript nnoremap <buffer> <leader>f :call Prettier()<CR>
 
 " {{{ OCAML Support
 
-" let g:opamshare = substitute(system('opam config var share'),'\n$','','''')
-" execute "set rtp+=" . g:opamshare . "/merlin/vim"
+if empty($ESY__ROOT_PACKAGE_CONFIG_PATH)
+    let g:opamshare = substitute(system('opam var share'),'\n$','','''')
+    " let g:opamshare = substitute(system('opam var share --switch=reason-bs-6'),'\n$','','''')
+    execute "set rtp+=" . g:opamshare . "/merlin/vim"
+endif
 
-" ## added by OPAM user-setup for vim / base ## 93ee63e278bdfc07d1139a748ed3fff2 ## you can edit, but keep this line
-" let s:opam_share_dir = system("opam config var share")
-" let s:opam_share_dir = substitute(s:opam_share_dir, '[\r\n]*$', '', '')
+function! MerlinSetBEnv(switch)
+    let l:env = system('opam env --switch=' . a:switch)
+    python3 <<EOF
+env = vim.eval("l:env")
+ret = []
+for line in env.strip().split('\n'):
+    var = line.split(';')[0].strip()
+    try:
+        var, value = var.split('=')
+    except:
+        continue
+    ret.append(f'\'{var}\': {value}')
+vim.command("let b:merlin_env = {" + ", ".join(ret) + "}")
+EOF
+endfunction
 
-" let s:opam_configuration = {}
-
-" function! OpamConfOcpIndent()
-"   execute "set rtp^=" . s:opam_share_dir . "/ocp-indent/vim"
+" function! MerlinSelectBinary()
+"     echom "MerlinSelectBinary"
+"     let g:yyy = &filetype
+"     if &filetype == 'reason'
+"         let l:path = substitute(system('opam exec --switch=reason-bs-6 -- which ocamlmerlin'),'\n$','','''')
+"         call MerlinSetBEnv('reason-bs-6')
+"         return l:path
+"     else
+"         let l:switch = substitute(system('opam switch show'),'\n$','','''')
+"         let l:path = substitute(system('opam exec -- which ocamlmerlin'),'\n$','','''')
+"         call MerlinSetBEnv(l:switch)
+"         let g:switch = l:switch
+"         let g:ppath = l:path
+"         return l:path
+"     endif
 " endfunction
-" let s:opam_configuration['ocp-indent'] = function('OpamConfOcpIndent')
 
-" function! OpamConfOcpIndex()
-"   execute "set rtp+=" . s:opam_share_dir . "/ocp-index/vim"
-" endfunction
-" let s:opam_configuration['ocp-index'] = function('OpamConfOcpIndex')
-
-" function! OpamConfMerlin()
-"   let l:dir = s:opam_share_dir . "/merlin/vim"
-"   execute "set rtp+=" . l:dir
-" endfunction
-" let s:opam_configuration['merlin'] = function('OpamConfMerlin')
-
-" let s:opam_packages = ["ocp-indent", "ocp-index", "merlin"]
-" let s:opam_check_cmdline = ["opam list --installed --short --safe --color=never"] + s:opam_packages
-" let s:opam_available_tools = split(system(join(s:opam_check_cmdline)))
-" for tool in s:opam_packages
-"   " Respect package order (merlin should be after ocp-index)
-"   if count(s:opam_available_tools, tool) > 0
-"     call s:opam_configuration[tool]()
-"   endif
-" endfor
-" ## end of OPAM user-setup addition for vim / base ## keep this line
 "
 autocmd FileType ocaml setlocal commentstring=(*%s*)
 
@@ -453,18 +544,13 @@ autocmd FileType ocaml,reason nnoremap <leader>t :MerlinTypeOf<CR>
 autocmd FileType ocaml,reason nnoremap <leader>d :MerlinDestruct<CR>
 autocmd FileType ocaml,reason nnoremap <leader>l :MerlinLocate<CR>
 autocmd FileType ocaml,reason nnoremap <leader><Enter> :MerlinClearEnclosing<CR>
-" }}}
 
-" {{{ Python
-" }}}
 
-" {{{ Language Server: Reason, OCaml
-let g:LanguageClient_serverCommands = {
-    \ 'reason': ['ocaml-language-server', '--stdio'],
-    \ 'ocaml': ['ocaml-language-server', '--stdio'],
-    \ }
+autocmd FileType reason setlocal formatprg=refmt\ --parse\ re
+autocmd FileType reason nnoremap <buffer> <leader>f :call Prettier()<CR>
+autocmd FileType ocaml setlocal formatprg=ocamlformat\ --name=input.ml\ -
+autocmd FileType ocaml nnoremap <buffer> <leader>f :call Prettier()<CR>
 " }}}
-
 
 
 " let g:indentLine_setColors = 0
@@ -474,15 +560,19 @@ let g:LanguageClient_serverCommands = {
 
 let $NVIM_TUI_ENABLE_CURSOR_SHAPE=1
 
-" {{{ Language Server
-" if executable('pyls')
-"     " pip install python-language-server
-"     au User lsp_setup call lsp#register_server({
-"         \ 'name': 'pyls',
-"         \ 'cmd': ['pyls'],
-"         \ 'whitelist': ['python'],
-"         \ })
-" endif
+
+" {{{ Hide cursor line from inactive split
+augroup CursorLineColumn
+    au!
+    au VimEnter * setlocal cursorline
+    au WinEnter * setlocal cursorline
+    au BufWinEnter * setlocal cursorline
+    au WinLeave * setlocal nocursorline
+    au VimEnter * setlocal colorcolumn=80
+    au WinEnter * setlocal colorcolumn=80
+    au BufWinEnter * setlocal colorcolumn=80
+    au WinLeave * setlocal colorcolumn=
+augroup END
 " }}}
 
 " {{{ Russian Phonetic Mapping

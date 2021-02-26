@@ -7,23 +7,51 @@ source $ZSH/oh-my-zsh.sh
 # }}}
 
 # {{{ GLOBAL Environment variables: PATH, LC_ALL, etc
-export PATH="/Users/zindel/bin:/Users/zindel/.local/bin:/Users/zindel/.cabal/bin:/usr/local/texlive/2015basic/bin/x86_64-darwin/:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
+export PATH="/Users/zindel/bin:/Users/zindel/.local/bin:/Users/zindel/.cabal/bin:/usr/local/texlive/2015basic/bin/x86_64-darwin/:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:./local/texlive/2018basic/bin/x86_64-darwin/:$PATH"
 export LC_ALL=en_US.UTF-8
 export EDITOR=nvim
 export LC_COLLATE=C
+
+export PATH="/usr/local/opt/postgresql@9.4/bin:$PATH"
+export GPG_TTY=$(tty)
 # }}}
 
 # {{{ Prompt
 setopt prompt_subst
-export PS1='%{$fg[blue]%}%~%{$reset_color%} %{$fg[green]%}$(vcprompt --format="[%b]")%{$reset_color%}$ '
+export PS1='%{$fg[blue]%}%~%{$reset_color%} %{$fg[green]%}$(vcprompt -f "[%b]")%{$reset_color%}$ '
 # }}}
 
-# {{{ virtualenvwrapper
-export WORKON_HOME=/Users/zindel/dev
-source /usr/local/bin/virtualenvwrapper.sh
-if [ -n "$VIRTUAL_ENV" ]; then
-    workon `basename $VIRTUAL_ENV`
-fi
+# {{{ pyenv / virtualenvwrapper
+# export PATH="/Users/zindel/.pyenv/shims:${PATH}"
+# export PYENV_SHELL=zsh
+# source '/usr/local/Cellar/pyenv/1.2.7/libexec/../completions/pyenv.zsh'
+# pyenv() {
+#   local command
+#   command="${1:-}"
+#   if [ "$#" -gt 0 ]; then
+#     shift
+#   fi
+
+#   case "$command" in
+#   rehash|shell)
+#     eval "$(pyenv "sh-$command" "$@")";;
+#   *)
+#     command pyenv "$command" "$@";;
+#   esac
+# }
+
+# eval "$(pyenv init -)"
+# eval "$(pyenv virtualenv-init -)"
+
+# export WORKON_HOME=$HOME/dev
+# source ~/.pyenv/versions/2.7.15/bin/virtualenvwrapper.sh
+# if [ -n "$VIRTUAL_ENV" ]; then
+#     workon `basename $VIRTUAL_ENV`
+# fi
+
+# # Tell pyenv-virtualenvwrapper to use pyenv when creating new Python environments
+# export PYENV_VIRTUALENVWRAPPER_PREFER_PYVENV="true"
+
 # }}}
 
 # {{{ Octave support
@@ -35,17 +63,21 @@ alias pe="pip install -e"
 alias reload=". ~/.zshrc && echo 'ZSH config reloaded from ~/.zshrc'"
 alias tvim="tmux new-window -c \`pwd\` nvim"
 alias vim="nvim"
+# alias code="/Applications/Visual\\ Studio\\ Code.app/Contents/Resources/app/bin/code"
 
 alias fpack=/Users/zindel/ocaml/fastpack/_build/default/bin/fpack.exe
+alias fpack-current=/Users/zindel/ocaml/fastpack-watch-refactor/_build/default/bin/fpack.exe
 # }}}
 
-# {{{ OCAML support
-# . /Users/zindel/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true
-# eval `opam config env`;
+# {{{ OPAM support
+test -r /Users/zindel/.opam/opam-init/init.zsh && . /Users/zindel/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true
+# eval $(opam config env)
+# eval $(opam env)
+# export PATH="/usr/local/opt/m4/bin:$PATH"
 # }}}
 
 # {{{ Rust support
-source $HOME/.cargo/env
+# source $HOME/.cargo/env
 # }}}
 
 # {{{ $CHDIR: if set - go there
@@ -73,7 +105,7 @@ v() {
 
     if [ -z "$PANE" ]; then
         CMD='nvim'
-        if [ -f esy.lock ] || [ -f esyi.lock.json ]; then CMD='esy nvim'; fi
+        if [ -f esy.lock ] || [ -f esyi.lock.json ] || [ -f esy.lock.json ] || [ -d _esy ]; then CMD='esy nvim'; fi
 
         #
         CMD="VIRTUAL_ENV=$VIRTUAL_ENV $CMD"
@@ -99,7 +131,7 @@ v() {
 
 get_vim_pane() {
     tmux list-panes -F "#{pane_index} #{pane_current_command}" \
-          | grep "nvim\|bash\|esyCommand" \
+          | grep "nvim\|bash\|esyCommand\|esy.exe" \
           | awk '{print $1}'
 }
 # 2}}}
@@ -167,6 +199,16 @@ fdr() {
 
 # 1}}}
 
+# {{{1
+# Auto-completion
+# ---------------
+[[ $- == *i* ]] && source "/usr/local/opt/fzf/shell/completion.zsh" 2> /dev/null
+
+# Key bindings
+# ------------
+source "/usr/local/opt/fzf/shell/key-bindings.zsh"
+# 1}}}
+
 # {{{1 misc utilities
 # {{{2 'co': list terminal colors
 co() {
@@ -218,6 +260,22 @@ ghpublish() {
 }
 # }}}
 
+# {{{ node 8
+# export PATH="/usr/local/opt/node@8/bin:$PATH"
+# export LDFLAGS="-L:/usr/local/opt/node@8/lib $LDFLAGS"
+# export CPPFLAGS="-I/usr/local/opt/node@8/include $CPPFLAGS"
+# }}}
 
+
+# {{{1 nvm
+# export NVM_DIR="$HOME/.nvm"
+# [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+# [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+# }}}
+
+
+# fnm
+# export PATH=$HOME/.fnm:$PATH
+# eval "`fnm env --multi --use-on-cd`"
 
 # vim: foldmethod=marker:
